@@ -140,3 +140,27 @@ output), `api`, `web` (multi-stage build of `frontend/` served by nginx, which a
 - Don't commit `media/` or `data/` (gitignored).
 - Training-logic changes (progression, 1RM, session read-back) need a unit test in `src/lib`
   beside the code, not just manual clicking-through.
+
+## Coaching and nutrition additions (this fork)
+
+Spec and decisions: docs/dev/KIT.md, docs/dev/RECON.md.
+
+### Where new code goes (additive only)
+- frontend/src/lib/nutrition/    pure helpers + tests (calculator, food maths, targets, merge, search)
+- frontend/src/lib/coaching/     pure helpers + tests (overview flags, effective targets)
+- frontend/src/store/useNutrition.js   separate Zustand store, localStorage key gym_nutrition_v1
+- frontend/src/views/nutrition/  diary, add-food sheet, report, targets
+- frontend/src/views/coach/      coach area
+- api/modules/nutrition.js, api/modules/coaching.js   routes registered from server.js with minimal edits
+- api/test/                      node:test files (node --test), no new dependency
+- tools/                         dataset build script (tools/build-foods.mjs), not shipped
+- foods/                         generated static dataset served like media/
+
+### Rules
+- Edit existing upstream files as little as possible. List every upstream file you touched in your report.
+- No new dependencies. No TypeScript. Match the existing style by hand.
+- Anything that calculates or merges is a pure helper in lib/ with a vitest test beside it.
+- API code uses the existing atomicWrite pattern and the existing auth helpers. The user id always comes from the session, never from the request.
+- Coaching features are server-only. Nutrition must also work in guest and Capacitor mode.
+- Both nutrition and coaching are OFF by default behind settings.
+- All UI text goes through the existing i18n catalogue in every locale.
